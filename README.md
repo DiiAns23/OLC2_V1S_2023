@@ -3,11 +3,12 @@
 ![Github](https://img.shields.io/badge/-Github-0d0d0d?style=flat&logo=github)
 ![Visual Studio Code](https://img.shields.io/badge/-Visual%20Studio%20Code-0d0d0d?style=flat&logo=visual-studio-code&logoColor=007ACC)
 
-```js
-Universidad San Carlos de Guatemala
-Programador: Diego Andrés Obín Rosales
-Carne: 201903865
-Correo: diego.obin23@gmail.com / 2742934200101@ingenieria.usac.edu.gt
+```python
+universidad = 'Universidad San Carlos de Guatemala'
+curso = 'Organización de Lenguajes y Compiladores 2'
+programador = 'Diego Andrés Obín Rosales'
+carne = '201903865'
+correo =  'diego.obin23@gmail.com'
 ```
 ---
 
