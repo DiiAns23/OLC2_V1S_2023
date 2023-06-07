@@ -5,18 +5,31 @@ errores = []
 
 reserved = {
     'console'     :   'RCONSOLE',
-    'log'         :   'RLOG'
+    'log'         :   'RLOG',
+    'let'         :   'RLET',
+    'string'      :   'RSTRING',
+    'number'      :   'RNUMBER',
+    'boolean'     :   'RBOOLEAN',
+    'true'        :   'RTRUE',
+    'false'       :   'RFALSE',
+    'if'          :   'RIF',
+    'else'        :   'RELSE',
+
 }
 
 tokens  = [
     'PUNTO',
+    'DPUNTOS',
     'PTCOMA',
     'PARI',
     'PARD',
+    'LLAVEIZQ',
+    'LLAVEDER',
     'MAS',
     'MENOS',
     'POR',
     'DIV',
+    'IGUAL',
     'ENTERO',
     'DECIMAL',
     'CADENA',
@@ -24,13 +37,17 @@ tokens  = [
 ]+ list(reserved.values())
 # Tokens
 t_PUNTO         = r'\.'
+t_DPUNTOS       = r'\:'
 t_PTCOMA        = r'\;'
 t_PARI          = r'\('
 t_PARD          = r'\)'
+t_LLAVEIZQ      = r'\{'
+t_LLAVEDER      = r'\}'
 t_MAS           = r'\+'
 t_MENOS         = r'\-'
 t_POR           = r'\*'
 t_DIV           = r'\/'
+t_IGUAL         = r'\='
 
 #Decimal
 def t_DECIMAL(t):
@@ -74,12 +91,12 @@ def t_ID(t):
 
 #Comentario de Una Linea
 def t_Com_Simple(t):
-    r'\#.*\n'
+    r'\/\/.*'
     t.lexer.lineno += 1
 
 #Comentario Multilinea
 def t_Com_Multiple(t):
-    r'\#=(.|\n)*?=\#'
+    r'\/\*(.|\n)*?\*\/'
     t.lexer.lineno += t.value.count('\n')
     
 #Nueva Linea
