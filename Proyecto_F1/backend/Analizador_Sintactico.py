@@ -1,8 +1,13 @@
+from src.Expresiones.identificador import Identificador
+from src.Tabla_Simbolos.arbol import Arbol
+from src.Tabla_Simbolos.excepcion import Excepcion
 import ply.yacc as yacc
 from Analizador_Lexico import tokens, lexer, errores, find_column
 from src.Expresiones.aritmetica import Aritmetica
 from src.Expresiones.primitivos import Primitivos
 from src.Instrucciones.imprimir import Imprimir
+from src.Instrucciones.declaracion_variables import Declaracion_Variables
+from src.Tabla_Simbolos.tabla_simbolos import TablaSimbolos
 
 precedence = (
     ('left','MAS','MENOS'),
@@ -41,8 +46,7 @@ def p_imprimir(t):
 
 def p_declaracion_normal(t):
     'declaracion_normal : RLET ID DPUNTOS tipo IGUAL expresion'
-    print('Variable:',t[2],'Tipo de dato:',t[4],'Expresion:',t[6])
-    t[0] = [t[2], t[4], t[6]]
+    t[0] = Declaracion_Variables(t[2], t[4], t[6], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_condicional_if(t):
     'condicional_if : RIF PARI expresion PARD LLAVEIZQ LLAVEDER'
@@ -72,6 +76,10 @@ def p_expresion_binaria(t):
 def p_expresion_unaria(t):
     'expresion : MENOS expresion %prec UMENOS'
     t[0] = -t[2]
+
+def p_identificador(t):
+    'expresion : ID'
+    t[0] = Identificador(t[1], t.lineno(1), find_column(input, t.slice[1]), None)
 
 def p_expresion_entero(t):
     'expresion : ENTERO'
@@ -109,9 +117,9 @@ def parse(inp):
     return parser.parse(inp)
 
 entrada = '''
-console.log("Hola, estoy siendo interpretado");
-console.log(4+"Hola"); // No la camioneta vaconsole.log(4+2-6*3);
-console.log(4/0);
+let a : number = 10;
+let b : number = a;
+console.log(b);
 '''
 
 def test_lexer(lexer):
@@ -124,7 +132,15 @@ def test_lexer(lexer):
 # lexer.input(entrada)
 # test_lexer(lexer)
 instrucciones = parse(entrada)
-for instr in instrucciones:
-    instr.interpretar(None, None)
+ast = Arbol(instrucciones)
+tsg = TablaSimbolos()
+ast.setTsglobal(tsg)
 
+
+for instruccion in ast.getInstr():
+    value = instruccion.interpretar(ast,tsg)
+    if isinstance(value, Excepcion):
+        ast.getExcepciones().append(value)
+        ast.updateConsola(value.toString())
+print(ast.getConsola())
 
