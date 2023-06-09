@@ -1,10 +1,25 @@
 // Entorno Global
 let a = 10;
+let b = 20;
+console.log(a);
 
-// Entorno de Local
-if(true) {
-    a = 30;
+console.log(a>b);
+
+if(a>b){
     console.log(a);
+    console.log(a>b);
+    if(a==10){
+    }
 }
 
-console.log(a);
+if(a>b){
+    console.log(a);
+    console.log(a>b);
+    if(a==10){
+    }
+}else{
+    console.log(b);
+    console.log(a<b);
+}
+
+//  {anterior: none, a:10, b:20, entorno_if: { anterior: 'superior' } }

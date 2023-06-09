@@ -29,6 +29,15 @@ tokens  = [
     'MENOS',
     'POR',
     'DIV',
+    'COMPARE',
+    'DIFERENTE',
+    'MAYOR',
+    'MENOR',
+    'MAYORIGUAL',
+    'MENORIGUAL',
+    'AND',
+    'OR',
+    'NOT',
     'IGUAL',
     'ENTERO',
     'DECIMAL',
@@ -47,6 +56,15 @@ t_MAS           = r'\+'
 t_MENOS         = r'\-'
 t_POR           = r'\*'
 t_DIV           = r'\/'
+t_COMPARE       = r'\=\=\='
+t_DIFERENTE     = r'\!\=\='
+t_MAYOR         = r'\>'
+t_MENOR         = r'\<'
+t_MAYORIGUAL    = r'\>='
+t_MENORIGUAL    = r'\<='
+t_AND           = r'&&'
+t_OR            = r'\|\|'
+t_NOT           = r'\!'
 t_IGUAL         = r'\='
 
 #Decimal
