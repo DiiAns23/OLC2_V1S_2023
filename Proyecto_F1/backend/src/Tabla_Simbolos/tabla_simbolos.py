@@ -30,6 +30,7 @@ class TablaSimbolos:
         while tablaActual != None:
             if simbolo.getID() in tablaActual.tabla:
                 tablaActual.tabla[simbolo.getID()].setValor(simbolo.getValor())
+                return None
                 # Si necesitan cambiar el tipo de dato
                 # tablaActual.tabla[simbolo.getID()].setTipo(simbolo.getTipo())
             else:

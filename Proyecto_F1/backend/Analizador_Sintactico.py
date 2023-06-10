@@ -1,3 +1,4 @@
+from src.Instrucciones.ciclo_for import For
 from src.Instrucciones.condicional_if import If
 from src.Expresiones.relacional_logica import Relacional_Logica
 from src.Expresiones.identificador import Identificador
@@ -45,7 +46,15 @@ def p_instrucciones_2(t):
 def p_instrucciones_evaluar(t):
     '''instruccion : imprimir PTCOMA
                     | declaracion_normal PTCOMA
-                    | condicional_ifs PTCOMA'''
+                    | condicional_ifs PTCOMA
+                    | cliclo_for PTCOMA'''
+    t[0] = t[1]
+
+def p_instrucciones_evaluar_1(t):
+    '''instruccion : imprimir
+                    | declaracion_normal
+                    | condicional_ifs
+                    | cliclo_for'''
     t[0] = t[1]
 
 def p_imprimir(t):
@@ -72,6 +81,9 @@ def p_condicional_if_else_if(t):
     'condicional_if : PARI expresion PARD LLAVEIZQ instrucciones LLAVEDER RELSE RIF condicional_if'
     t[0] = If(t[2], t[5], None, t[9], t.lineno(1), find_column(input, t.slice[1]))
 
+def p_ciclo_for(t):
+    'cliclo_for : RFOR PARI declaracion_normal PTCOMA expresion PTCOMA expresion PARD LLAVEIZQ instrucciones LLAVEDER'
+    t[0] = For(t[3], t[5], t[7], t[10], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_tipo(t):
     '''tipo : RSTRING
@@ -118,7 +130,6 @@ def p_expresion_binaria(t):
     elif t[2] == '||':
         t[0] = Relacional_Logica(t[1], t[3], '||', t.lineno(2), find_column(input, t.slice[2]))
     
-
 def p_expresion_unaria(t):
     '''expresion : MENOS expresion %prec UMENOS
                 | NOT expresion %prec UNOT'''
@@ -151,6 +162,16 @@ def p_expresion_boolean(t):
     else:
         t[0] = Primitivos('boolean', False, t.lineno(1), find_column(input, t.slice[1]))
 
+def p_expresion_incrementable(t):
+    '''expresion : expresion MAS MAS
+                | expresion MENOS MENOS'''
+    if t[2] == '+':
+        incrementable = Primitivos('number', 1, t.lineno(2), find_column(input, t.slice[2]))
+        t[0] = Aritmetica(t[1],incrementable, '+', t.lineno(2), find_column(input, t.slice[2]))
+    else:
+        incrementable = Primitivos('number', 1, t.lineno(2), find_column(input, t.slice[2]))
+        t[0] = Aritmetica(t[1],incrementable, '-', t.lineno(2), find_column(input, t.slice[2]))
+
 def p_error(t):
     print(" Error sintáctico en '%s'" % t.value)
 
@@ -166,45 +187,35 @@ def parse(inp):
     lexer.lineno = 1
     return parser.parse(inp)
 
-entrada = '''
-let a : number = 5;
-let b : number = 10;
-let c : number = 15;
-if (true) {
-    let a : number = 25;
-    let b : number = 50;
-    if(a===25){
-        console.log("Ya salio compi 2");
-        console.log("El valor de c es: ");
-        console.log(c);
-    };
-    console.log(a);
-    console.log(b);
-};
-console.log(a);
-console.log(b);
+# entrada = '''
+# let a : number = 5;
+# let b : number = a++;
 
-'''
+# for(let i : number = 0; i < 10; i++){
+#     console.log(i);
+# };
 
-def test_lexer(lexer):
-    while True:
-        tok = lexer.token()
-        if not tok:
-            break  # No more input
-        print(tok)
+# '''
 
-# lexer.input(entrada)
-# test_lexer(lexer)
-instrucciones = parse(entrada)
-ast = Arbol(instrucciones)
-tsg = TablaSimbolos()
-ast.setTsglobal(tsg)
+# def test_lexer(lexer):
+#     while True:
+#         tok = lexer.token()
+#         if not tok:
+#             break  # No more input
+#         print(tok)
+
+# # lexer.input(entrada)
+# # test_lexer(lexer)
+# instrucciones = parse(entrada)
+# ast = Arbol(instrucciones)
+# tsg = TablaSimbolos()
+# ast.setTsglobal(tsg)
 
 
-for instruccion in ast.getInstr():
-    value = instruccion.interpretar(ast,tsg)
-    if isinstance(value, Excepcion):
-        ast.getExcepciones().append(value)
-        ast.updateConsola(value.toString())
-print(ast.getConsola())
+# for instruccion in ast.getInstr():
+#     value = instruccion.interpretar(ast,tsg)
+#     if isinstance(value, Excepcion):
+#         ast.getExcepciones().append(value)
+#         ast.updateConsola(value.toString())
+# print(ast.getConsola())
 

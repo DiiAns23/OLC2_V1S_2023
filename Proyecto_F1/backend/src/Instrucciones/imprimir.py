@@ -9,4 +9,5 @@ class Imprimir(Abstract):
     def interpretar(self, tree, table):
         value = self.expresion.interpretar(tree, table)
         print(value)
+        tree.updateConsola(str(value))
         return value

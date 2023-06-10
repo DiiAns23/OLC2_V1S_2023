@@ -14,6 +14,7 @@ reserved = {
     'false'       :   'RFALSE',
     'if'          :   'RIF',
     'else'        :   'RELSE',
+    'for'         :   'RFOR',
 
 }
 
