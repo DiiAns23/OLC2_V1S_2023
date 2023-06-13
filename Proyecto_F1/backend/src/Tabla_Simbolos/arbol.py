@@ -30,7 +30,7 @@ class Arbol:
 
     def getFuncion(self, ide):
         for funcion in self.funciones:
-            if funcion.ide == ide:
+            if funcion.nombre == ide:
                 return funcion
         return None
     

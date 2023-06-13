@@ -1,3 +1,6 @@
+from src.Instrucciones._return import Return
+from src.Instrucciones.llamada_funcion import Llamada_Funcion
+from src.Instrucciones.funcion import Funcion
 from src.Instrucciones.ciclo_for import For
 from src.Instrucciones.condicional_if import If
 from src.Expresiones.relacional_logica import Relacional_Logica
@@ -47,14 +50,21 @@ def p_instrucciones_evaluar(t):
     '''instruccion : imprimir PTCOMA
                     | declaracion_normal PTCOMA
                     | condicional_ifs PTCOMA
-                    | cliclo_for PTCOMA'''
+                    | cliclo_for PTCOMA
+                    | funcion PTCOMA
+                    | llamada_funcion PTCOMA
+                    | r_return PTCOMA'''
     t[0] = t[1]
 
 def p_instrucciones_evaluar_1(t):
     '''instruccion : imprimir
                     | declaracion_normal
                     | condicional_ifs
-                    | cliclo_for'''
+                    | cliclo_for
+                    | funcion
+                    | llamada_funcion
+                    | r_return
+                    '''
     t[0] = t[1]
 
 def p_imprimir(t):
@@ -84,6 +94,15 @@ def p_condicional_if_else_if(t):
 def p_ciclo_for(t):
     'cliclo_for : RFOR PARI declaracion_normal PTCOMA expresion PTCOMA expresion PARD LLAVEIZQ instrucciones LLAVEDER'
     t[0] = For(t[3], t[5], t[7], t[10], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_funcion(t):
+    'funcion : RFUNCTION ID PARI PARD LLAVEIZQ instrucciones LLAVEDER'
+    t[0] = Funcion(t[2],None,t[6], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_llamada_funcion(t):
+    'llamada_funcion : ID PARI PARD'
+    t[0] = Llamada_Funcion(t[1],None,t.lineno(1), find_column(input, t.slice[1]))
+
 
 def p_tipo(t):
     '''tipo : RSTRING
@@ -172,6 +191,14 @@ def p_expresion_incrementable(t):
         incrementable = Primitivos('number', 1, t.lineno(2), find_column(input, t.slice[2]))
         t[0] = Aritmetica(t[1],incrementable, '-', t.lineno(2), find_column(input, t.slice[2]))
 
+def p_expresion_funcion(t):
+    'expresion : llamada_funcion'
+    t[0] = t[1]
+    
+def p_return(t):
+    'r_return : RRETURN expresion'
+    t[0] = Return(t[2], t.lineno(1), find_column(input, t.slice[1]))
+
 def p_error(t):
     print(" Error sintáctico en '%s'" % t.value)
 
@@ -187,35 +214,41 @@ def parse(inp):
     lexer.lineno = 1
     return parser.parse(inp)
 
-# entrada = '''
-# let a : number = 5;
-# let b : number = a++;
+entrada = '''
 
-# for(let i : number = 0; i < 10; i++){
-#     console.log(i);
-# };
+function diez(){
+    return 10;
+}
+function quince(){
+    return 15;
+}
+let a:number = diez()/2 + quince();
 
-# '''
+console.log(a);
+'''
 
-# def test_lexer(lexer):
-#     while True:
-#         tok = lexer.token()
-#         if not tok:
-#             break  # No more input
-#         print(tok)
+def test_lexer(lexer):
+    while True:
+        tok = lexer.token()
+        if not tok:
+            break  # No more input
+        print(tok)
 
-# # lexer.input(entrada)
-# # test_lexer(lexer)
-# instrucciones = parse(entrada)
-# ast = Arbol(instrucciones)
-# tsg = TablaSimbolos()
-# ast.setTsglobal(tsg)
+# lexer.input(entrada)
+# test_lexer(lexer)
+instrucciones = parse(entrada)
+ast = Arbol(instrucciones)
+tsg = TablaSimbolos()
+ast.setTsglobal(tsg)
 
+for instruccion in ast.getInstr():
+    if isinstance(instruccion, Funcion):
+        ast.setFunciones(instruccion)
 
-# for instruccion in ast.getInstr():
-#     value = instruccion.interpretar(ast,tsg)
-#     if isinstance(value, Excepcion):
-#         ast.getExcepciones().append(value)
-#         ast.updateConsola(value.toString())
-# print(ast.getConsola())
+for instruccion in ast.getInstr():
+    if not(isinstance(instruccion, Funcion)):
+        value = instruccion.interpretar(ast,tsg)
+        if isinstance(value, Excepcion):
+            ast.setExcepciones(value)
+print(ast.getConsola())
 

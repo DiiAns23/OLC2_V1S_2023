@@ -15,6 +15,8 @@ reserved = {
     'if'          :   'RIF',
     'else'        :   'RELSE',
     'for'         :   'RFOR',
+    'function'    :   'RFUNCTION',
+    'return'      :   'RRETURN',
 
 }
 

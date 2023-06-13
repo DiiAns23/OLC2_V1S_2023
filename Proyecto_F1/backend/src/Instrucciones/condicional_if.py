@@ -21,7 +21,7 @@ class If(Abstract):
             for instruccion in self.bloqueIf:
                 result = instruccion.interpretar(arbol, entorno) 
                 if isinstance(result, Excepcion) :
-                    arbol.setExcepcion(result)
+                    arbol.setExcepciones(result)
         elif self.bloqueElse != None:
             entorno = TablaSimbolos(tabla)
             for instruccion in self.bloqueElse:

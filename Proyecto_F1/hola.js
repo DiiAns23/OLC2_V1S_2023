@@ -1,25 +1,13 @@
-// Entorno Global
-let a = 10;
-let b = 20;
-console.log(a);
+let c = "Hola";
 
-console.log(a>b);
-
-if(a>b){
-    console.log(a);
-    console.log(a>b);
-    if(a==10){
+let d = "saludito"
+if(d == "saludito"){
+    let c = "Adios";
+    if(d=="saludito"){
+        Suma();
     }
 }
 
-if(a>b){
-    console.log(a);
-    console.log(a>b);
-    if(a==10){
-    }
-}else{
-    console.log(b);
-    console.log(a<b);
+function Suma(a,b){
+    console.log(c);
 }
-
-//  {anterior: none, a:10, b:20, entorno_if: { anterior: 'superior' } }
