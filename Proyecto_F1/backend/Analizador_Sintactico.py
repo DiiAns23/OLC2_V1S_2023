@@ -14,7 +14,8 @@ from src.Expresiones.primitivos import Primitivos
 from src.Instrucciones.imprimir import Imprimir
 from src.Instrucciones.declaracion_variables import Declaracion_Variables
 from src.Tabla_Simbolos.tabla_simbolos import TablaSimbolos
-
+import sys
+sys.setrecursionlimit(10000000)
 # Definicion de la jerarquia de operadores
 precedence = (
     ('left', 'OR'),
@@ -22,7 +23,7 @@ precedence = (
     ('right','UNOT'),
     ('left', 'COMPARE', 'DIFERENTE'),
     ('left', 'MENOR', 'MAYOR', 'MAYORIGUAL', 'MENORIGUAL'),
-    ('left','MAS','MENOS'),
+    ('left','MAS','MENOS', 'COMA'),
     ('left','POR','DIV'),
     ('left','PARI', 'PARD'),
     ('right','UMENOS'),
@@ -96,12 +97,54 @@ def p_ciclo_for(t):
     t[0] = For(t[3], t[5], t[7], t[10], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_funcion(t):
-    'funcion : RFUNCTION ID PARI PARD LLAVEIZQ instrucciones LLAVEDER'
-    t[0] = Funcion(t[2],None,t[6], t.lineno(1), find_column(input, t.slice[1]))
+    '''funcion : RFUNCTION ID PARI PARD LLAVEIZQ instrucciones LLAVEDER
+                | RFUNCTION ID PARI parametros PARD LLAVEIZQ instrucciones LLAVEDER'''
+    if len(t) == 6:
+        t[0] = Funcion(t[2],None,t[6], t.lineno(1), find_column(input, t.slice[1]))
+    else:
+        t[0] = Funcion(t[2], t[4], t[7], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_llamada_funcion(t):
-    'llamada_funcion : ID PARI PARD'
-    t[0] = Llamada_Funcion(t[1],None,t.lineno(1), find_column(input, t.slice[1]))
+    '''llamada_funcion : ID PARI PARD
+                        | ID PARI parametros_ll PARD''' 
+    # (let nombre: string, let apellido: string, let edad: number)
+    if len(t) == 3:
+        t[0] = Llamada_Funcion(t[1],None,t.lineno(1), find_column(input, t.slice[1]))
+    else:
+        t[0] = Llamada_Funcion(t[1], t[3], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_parametros(t):
+    'parametros : parametros COMA parametro'
+    t[1].append(t[3])
+    t[0] = t[1]
+
+def p_parametros_2(t):
+    'parametros : parametro'
+    t[0] = [t[1]]
+
+def p_parametro(t):
+    '''parametro : RLET ID DPUNTOS tipo  
+                | ID DPUNTOS tipo
+                | ID'''
+    if len(t) == 2:
+        t[0] = {'tipo': 'any', 'id': t[1]}
+    elif len(t) == 4:
+        t[0] = {'tipo': t[3], 'id': t[1]}
+    else:
+        t[0] = {'tipo': t[4], 'id': t[2]}
+
+def p_parametros_ll(t):
+    'parametros_ll : parametros_ll COMA parametro_ll'
+    t[1].append(t[3])
+    t[0] = t[1]
+
+def p_parametros_ll_2(t):
+    'parametros_ll : parametro_ll'
+    t[0] = [t[1]]
+
+def p_parametro_ll(t):
+    '''parametro_ll : expresion'''
+    t[0] = t[1]
 
 
 def p_tipo(t):
@@ -216,15 +259,16 @@ def parse(inp):
 
 entrada = '''
 
-function diez(){
-    return 10;
+function fibonacci(n: number) {
+    if (n <= 1) {
+        return n;
+    } else {
+        return fibonacci(n - 1) + fibonacci(n-2);
+    }
 }
-function quince(){
-    return 15;
-}
-let a:number = diez()/2 + quince();
 
-console.log(a);
+console.log(fibonacci(30));
+
 '''
 
 def test_lexer(lexer):

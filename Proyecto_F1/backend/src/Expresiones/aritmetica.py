@@ -1,3 +1,4 @@
+from ..Tabla_Simbolos.excepcion import Excepcion
 from ..Abstract.abstract import Abstract
 
 class Aritmetica(Abstract):
@@ -11,7 +12,9 @@ class Aritmetica(Abstract):
     
     def interpretar(self, tree, table):
         izq = self.op_izq.interpretar(tree, table)
+        if isinstance(izq, Excepcion): return izq
         der = self.op_der.interpretar(tree, table)
+        if isinstance(der, Excepcion): return der
         if self.op == '+':
             self.tipo = 'number'
             return izq + der
