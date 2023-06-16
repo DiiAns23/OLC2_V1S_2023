@@ -260,7 +260,9 @@ def parse(inp):
 
 entrada = '''
 
-console.log(4+5*6/3-4*8);
+let a: number = 4+5*6;
+let b: number = 4+5*6;
+console.log(a+b);
 
 '''
 

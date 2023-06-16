@@ -24,6 +24,9 @@ class Llamada_Funcion(Abstract):
                     simbolo = Simbolo(str(result.parametros[contador]['id']), expresion.tipo, resultE, self.fila, self.columna)
                     resultT = entorno.setTablaFuncion(simbolo)
                     if isinstance(resultT, Excepcion): return resultT
+                elif result.parametros[contador]['tipo'] == 'any':
+                    simbolo = Simbolo(str(result.parametros[contador]["id"]), expresion.tipo, resultE, self.fila, self.columna)
+                    resultT = entorno.setTablaFuncion(simbolo)
                 else:
                     return Excepcion("Semantico", "Tipo de dato diferente en Parametros", str(self.fila), str(self.columna))
                 contador += 1

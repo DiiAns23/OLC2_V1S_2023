@@ -1,3 +1,7 @@
+from src.Nativas.tostring import String
+from src.Nativas.tolowercase import ToLowerCase
+from src.Nativas.touppercase import ToUpperCase
+from src.Nativas.typeof import Typeof
 from src.Instrucciones._return import Return
 from src.Instrucciones.llamada_funcion import Llamada_Funcion
 from src.Instrucciones.funcion import Funcion
@@ -69,7 +73,7 @@ def p_instrucciones_evaluar_1(t):
     t[0] = t[1]
 
 def p_imprimir(t):
-    'imprimir : RCONSOLE PUNTO RLOG PARI expresion PARD'
+    'imprimir : RCONSOLE PUNTO RLOG PARI parametros_ll PARD'
     t[0] = Imprimir(t[5], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_declaracion_normal(t):
@@ -242,6 +246,29 @@ def p_return(t):
     'r_return : RRETURN expresion'
     t[0] = Return(t[2], t.lineno(1), find_column(input, t.slice[1]))
 
+def agregarNativas(ast):
+    instrucciones = []
+
+    nombre = "typeof"
+    parametro = [{'tipo':'any', 'id':'typeof##Param1'}]
+    typeof = Typeof(nombre, parametro, instrucciones, -1,-1)
+    ast.setFunciones(typeof)
+
+    nombre = "toUpperCase"
+    parametro = [{'tipo':'any', 'id':'toUpperCase##Param1'}]
+    toUpperCase = ToUpperCase(nombre, parametro, instrucciones, -1,-1)
+    ast.setFunciones(toUpperCase)
+
+    nombre = "toLowerCase"
+    parametro = [{'tipo':'any', 'id':'toLower##Param1'}]
+    toLowerCase = ToLowerCase(nombre, parametro, instrucciones, -1,-1)
+    ast.setFunciones(toLowerCase)
+
+    nombre = "toString"
+    parametro = [{'tipo':'any', 'id':'toString##Param1'}]
+    toString = String(nombre, parametro, instrucciones, -1,-1)
+    ast.setFunciones(toString)
+
 def p_error(t):
     print(" Error sintáctico en '%s'" % t.value)
 
@@ -259,16 +286,10 @@ def parse(inp):
 
 entrada = '''
 
-function fibonacci(n: number) {
-    if (n <= 1) {
-        return n;
-    } else {
-        return fibonacci(n - 1) + fibonacci(n-2);
-    }
-}
-
-console.log(fibonacci(30));
-
+let a: number = 5;
+console.log(typeof(toString(a))); // llamada a una funcion
+let b: number = 5;
+console.log(a+b); // llamada a una funcion
 '''
 
 def test_lexer(lexer):
@@ -284,6 +305,7 @@ instrucciones = parse(entrada)
 ast = Arbol(instrucciones)
 tsg = TablaSimbolos()
 ast.setTsglobal(tsg)
+agregarNativas(ast)
 
 for instruccion in ast.getInstr():
     if isinstance(instruccion, Funcion):
