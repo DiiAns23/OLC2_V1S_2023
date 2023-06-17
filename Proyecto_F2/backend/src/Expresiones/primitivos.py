@@ -13,7 +13,22 @@ class Primitivos(Abstract):
     def interpretar(self, tree, table):
         genAux = Generador()
         generador = genAux.getInstance()
-        return Return(str(self.valor), self.tipo, False)
+        if self.tipo == 'number':
+            return Return(str(self.valor), self.tipo, False)
+        elif self.tipo == 'string':
+            temporal = generador.addTemp()
+            generador.addAsig(temporal, 'H')
+
+            for char in str(self.valor):
+                generador.setHeap('H', ord(char))
+                generador.nextHeap()
+            generador.setHeap('H', -1)
+            generador.nextHeap()
+
+            return Return(temporal, self.tipo, True)
+        
+        elif self.tipo == 'boolean':
+            ''
 
     def getTipo(self):
         return self.tipo

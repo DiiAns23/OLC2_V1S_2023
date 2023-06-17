@@ -18,3 +18,18 @@ class Imprimir(Abstract):
 
         if value.getTipo() == 'number':
             generator.addPrint('f', value.getValue())
+        elif value.getTipo() == 'string':
+            generator.fPrintString()
+
+            paramTemp = generator.addTemp()
+            
+            generator.addExp(paramTemp, 'P', table.size, '+')
+            generator.addExp(paramTemp, paramTemp, '1', '+')
+            generator.setStack(paramTemp, value.value)
+            
+            generator.newEnv(table.size)
+            generator.callFun('printString')
+
+            temp = generator.addTemp()
+            generator.getStack(temp, 'P')
+            generator.retEnv(table.size)

@@ -260,9 +260,10 @@ def parse(inp):
 
 entrada = '''
 
-let a: number = 4+5*6;
-let b: number = 4+5*6;
-console.log(a+b);
+let a:string = "Hola mundo de compiladores 2";
+let b:string = "Adios mundo de compiladores 2";
+console.log(a);
+console.log(b);
 
 '''
 
@@ -286,13 +287,8 @@ tsg = TablaSimbolos()
 ast.setTsglobal(tsg)
 
 for instruccion in ast.getInstr():
-    if isinstance(instruccion, Funcion):
-        ast.setFunciones(instruccion)
-
-for instruccion in ast.getInstr():
-    if not(isinstance(instruccion, Funcion)):
-        value = instruccion.interpretar(ast,tsg)
-        if isinstance(value, Excepcion):
-            ast.setExcepciones(value)
+    value = instruccion.interpretar(ast,tsg)
+    if isinstance(value, Excepcion):
+        ast.setExcepciones(value)
 print(generador.getCode())
 
