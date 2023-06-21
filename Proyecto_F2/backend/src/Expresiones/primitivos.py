@@ -28,7 +28,24 @@ class Primitivos(Abstract):
             return Return(temporal, self.tipo, True)
         
         elif self.tipo == 'boolean':
-            ''
+            if self.trueLbl == '':
+                self.trueLbl = generador.newLabel()
+            if self.falseLbl == '':
+                self.falseLbl = generador.newLabel()
+            
+            if self.valor:
+                generador.addGoto(self.trueLbl)
+                generador.addComment("GOTO PARA EVITAR ERROR DE GO")
+                generador.addGoto(self.falseLbl)
+            else:
+                generador.addGoto(self.falseLbl)
+                generador.addComment("GOTO PARA EVITAR ERROR DE GO")
+                generador.addGoto(self.trueLbl)
+            
+            ret = Return(self.valor, self.tipo, False)
+            ret.setTrueLbl(self.trueLbl)
+            ret.setFalseLbl(self.falseLbl)
+            return ret
 
     def getTipo(self):
         return self.tipo

@@ -33,3 +33,17 @@ class Imprimir(Abstract):
             temp = generator.addTemp()
             generator.getStack(temp, 'P')
             generator.retEnv(table.size)
+        elif value.getTipo() == 'boolean':
+            tempLbl = generator.newLabel()
+
+            generator.putLabel(value.getTrueLbl())
+            generator.printTrue()
+
+            generator.addGoto(tempLbl)
+
+            generator.putLabel(value.getFalseLbl())
+            generator.printFalse()
+
+            generator.putLabel(tempLbl)
+
+        generator.addPrint('c', 10)

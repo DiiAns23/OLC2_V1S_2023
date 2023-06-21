@@ -20,6 +20,7 @@ class Generador:
 
         # Lista de Nativas
         self.printString = False
+        self.compareString = False
 
         # Listas de imports
         self.imports = []
@@ -160,9 +161,9 @@ class Generador:
         self.codeIn(f'func {id}(){{\n')
     
     def addEndFunc(self):
-        if not self.inNatives:
+        self.codeIn('return;\n}\n');
+        if(not self.inNatives):
             self.inFunc = False
-        self.codeIn('}\n')
         
     ###############
     # STACK
@@ -179,15 +180,13 @@ class Generador:
     #############
 
     def newEnv(self, size):
-        self.codeIn(f'/* --- NUEVO ENTORNO --- */\n')
         self.codeIn(f'P = P + {size};\n')
     
     def callFun(self, id):
-        self.codigo += f'{id}();\n'
+        self.codeIn(f'{id}();\n')
     
     def retEnv(self, size):
-        self.codigo += f'P = P - {size};\n'
-        self.codigo += '/* --- RETORNO DE ENTORNO --- */\n'
+        self.codeIn(f'P = P - {size};\n')
 
     ###############
     # HEAP
@@ -208,9 +207,32 @@ class Generador:
 
     def addPrint(self, type, value):
         self.setImport('fmt')
-        self.codeIn(f'fmt.Printf("%{type}", int({value}));\n')
+        self.codeIn(f'fmt.Printf("%{type}", {value});\n')
     
 
+    def printTrue(self):
+        self.setImport('fmt')
+        self.addIdent()
+        self.addPrint("c", 116)
+        self.addIdent()
+        self.addPrint("c", 114)
+        self.addIdent()
+        self.addPrint("c", 117)
+        self.addIdent()
+        self.addPrint("c", 101)
+    
+    def printFalse(self):
+        self.setImport('fmt')
+        self.addIdent()
+        self.addPrint("c", 102)
+        self.addIdent()
+        self.addPrint("c", 97)
+        self.addIdent()
+        self.addPrint("c", 108)
+        self.addIdent()
+        self.addPrint("c", 115)
+        self.addIdent()
+        self.addPrint("c", 101)
     ###############
     # NATIVAS
     ###############
@@ -250,5 +272,58 @@ class Generador:
         self.addEndFunc()
         self.inNatives = False
 
-        
+    def fcompareString(self):
+        if self.compareString:
+            return
+        self.compareString = True
+        self.inNatives = True
+
+        self.addBeginFunc("compareString")
+        # Label para salir de la funcion
+        returnLbl = self.newLabel()
+
+        t2 = self.addTemp()
+        self.addExp(t2, 'P', '1', '+')
+        t3 = self.addTemp()
+        self.getStack(t3, t2)
+        self.addExp(t2,t2,'1', '+')
+        t4 = self.addTemp()
+        self.getStack(t4, t2)
+
+        l1 = self.newLabel()
+        l2 = self.newLabel()
+        l3 = self.newLabel()
+        self.putLabel(l1)
+
+        t5 = self.addTemp()
+        self.addIdent()
+        self.getHeap(t5,t3)
+
+        t6 = self.addTemp()
+        self.addIdent()
+        self.getHeap(t6,t4)
+
+        self.addIdent()
+        self.addIf(t5,t6,'!=', l3)
+        self.addIdent()
+        self.addIf(t5,'-1', '==', l2)
+
+        self.addIdent()
+        self.addExp(t3, t3,'1', '+')
+        self.addIdent()
+        self.addExp(t4, t4,'1','+')
+        self.addIdent()
+        self.addGoto(l1)
+
+        self.putLabel(l2)
+        self.addIdent()
+        self.setStack('P', '1')
+        self.addIdent()
+        self.addGoto(returnLbl)
+        self.putLabel(l3)
+        self.addIdent()
+        self.setStack('P', '0')
+        self.putLabel(returnLbl)
+        self.addEndFunc()
+        self.inNatives = False
 # console.log(4+5*6);

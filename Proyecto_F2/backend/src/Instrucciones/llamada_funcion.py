@@ -1,34 +1,74 @@
-from ..Tabla_Simbolos.simbolo import Simbolo
+from typing import List
+from ..Instrucciones._return import Return
+from ..Abstract.return__ import Return as Return2
+from ..Tabla_Simbolos.generador import Generador
 from ..Abstract.abstract import Abstract
 from ..Tabla_Simbolos.excepcion import Excepcion
 from ..Tabla_Simbolos.tabla_simbolos import TablaSimbolos
+
 
 class Llamada_Funcion(Abstract):
 
     def __init__(self, nombre, parametros, fila, columna):
         self.nombre = nombre
         self.parametros = parametros
+        self.trueLbl = ''
+        self.falseLbl = ''
         super().__init__(fila, columna)
     
     def interpretar(self, arbol, tabla):
-        result = arbol.getFuncion(self.nombre)
-        if result == None:
-            return Excepcion("Semantico", "No se encontro la funcion: " + str(self.nombre), str(self.fila), str(self.columna))
-        entorno = TablaSimbolos(arbol.getTsglobal())
-        if len(self.parametros) == len(result.parametros):
-            contador = 0
-            for expresion in self.parametros:
-                resultE = expresion.interpretar(arbol, tabla)
-                if isinstance(resultE, Excepcion): return resultE
-                if result.parametros[contador]['tipo'] == expresion.tipo:
-                    simbolo = Simbolo(str(result.parametros[contador]['id']), expresion.tipo, resultE, self.fila, self.columna)
-                    resultT = entorno.setTablaFuncion(simbolo)
-                    if isinstance(resultT, Excepcion): return resultT
-                else:
-                    return Excepcion("Semantico", "Tipo de dato diferente en Parametros", str(self.fila), str(self.columna))
-                contador += 1
+        genAux = Generador()
+        generador = genAux.getInstance()
+        funcion = arbol.getFuncion(self.nombre)
 
-        value = result.interpretar(arbol, entorno) # me puede retornar un valor
-        if isinstance(value, Excepcion): return value
-        self.tipo = result.tipo
-        return value
+        if funcion != None:
+            generador.addComment(f'Llamada a la funcion {self.nombre}')
+            paramValues = []
+            temps = []
+            size = tabla.size
+
+            for parametros in self.parametros:
+                value = parametros.interpretar(arbol, tabla)
+                if isinstance(value, Excepcion):
+                    return value
+                paramValues.append(value)
+                temps.append(value.getValue())
+            
+            temp = generador.addTemp()
+
+            generador.addExp(temp,'P',size+1, '+')
+            aux = 0
+            if len(funcion.getParams()) == len(paramValues):
+                for param in paramValues:
+                    if funcion.parametros[aux]['tipo'] == param.getTipo():
+                        aux += 1
+                        generador.setStack(temp,param.getValue())
+                        if aux != len(paramValues):
+                            generador.addExp(temp,temp,1,'+')
+                    else:
+                        generador.addComment(f'Fin de la llamada a la funcion {self.nombre} por error, consulte la lista de errores')
+                        return Excepcion("Semantico", f"El tipo de dato de los parametros no coincide con la funcion {self.nombre}", self.fila, self.columna)
+
+            generador.newEnv(size)
+            # self.getFuncion(funcion, arbol, tabla) # Sirve para llamar a una funcion nativa
+            generador.callFun(funcion.nombre)
+            generador.getStack(temp,'P')
+            generador.retEnv(size)
+            generador.addComment(f'Fin de la llamada a la funcion {self.nombre}')
+            generador.addSpace()
+
+            if funcion.getTipo() != 'boolean':
+                return Return2(temp, funcion.getTipo(), True)
+            else:
+                generador.addComment('Recuperacion de booleano')
+                if self.trueLbl == '':
+                    self.trueLbl = generador.newLabel()
+                if self.falseLbl == '':
+                    self.falseLbl = generador.newLabel()
+                generador.addIf(temp,1,'==',self.trueLbl)
+                generador.addGoto(self.falseLbl)
+                ret = Return(temp, funcion.getTipo(), True)
+                ret.trueLbl = self.trueLbl
+                ret.falseLbl = self.falseLbl
+                generador.addComment('Fin de recuperacion de booleano')
+                return ret

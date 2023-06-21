@@ -260,11 +260,11 @@ def parse(inp):
 
 entrada = '''
 
-let a:string = "Hola mundo de compiladores 2";
-let b:string = "Adios mundo de compiladores 2";
-console.log(a);
-console.log(b);
+function suma(a:number,b:number){
+    return a + b;
+}
 
+console.log(suma(7,8) + suma(2,4));
 '''
 
 def test_lexer(lexer):
