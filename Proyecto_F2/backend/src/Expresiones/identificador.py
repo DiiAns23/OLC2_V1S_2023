@@ -8,8 +8,8 @@ class Identificador(Abstract):
     def __init__(self, ide, fila, columna, tipo = None):
         self.ide = ide
         self.fila = fila
-        self.columna = columna
-        self.tipo = tipo
+        super().__init__(fila, columna)
+        
 
     def interpretar(self, arbol , tabla):
         genAux = Generador()

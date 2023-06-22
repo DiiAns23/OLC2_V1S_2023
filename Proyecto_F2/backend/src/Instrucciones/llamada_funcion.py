@@ -28,11 +28,18 @@ class Llamada_Funcion(Abstract):
             size = tabla.size
 
             for parametros in self.parametros:
-                value = parametros.interpretar(arbol, tabla)
-                if isinstance(value, Excepcion):
-                    return value
-                paramValues.append(value)
-                temps.append(value.getValue())
+                if isinstance(parametros, Llamada_Funcion):
+                    self.guardarTemps(generador, tabla, temps)
+                    a = parametros.interpretar(arbol, tabla)
+                    if isinstance(a, Excepcion): return a
+                    paramValues.append(a)
+                    self.recuperarTemps(generador, tabla, temps)
+                else:
+                    value = parametros.interpretar(arbol, tabla)
+                    if isinstance(value, Excepcion):
+                        return value
+                    paramValues.append(value)
+                    temps.append(value.getValue())
             
             temp = generador.addTemp()
 
@@ -72,3 +79,21 @@ class Llamada_Funcion(Abstract):
                 ret.falseLbl = self.falseLbl
                 generador.addComment('Fin de recuperacion de booleano')
                 return ret
+
+    def guardarTemps(self, generador, tabla, tmp2):
+        generador.addComment('Guardando temporales')
+        tmp = generador.addTemp()
+        for tmp1 in tmp2:
+            generador.addExp(tmp, 'P', tabla.size, '+')
+            generador.setStack(tmp, tmp1)
+            tabla.size += 1
+        generador.addComment('Fin de guardado de temporales')
+    
+    def recuperarTemps(self, generador, tabla, tmp2):
+        generador.addComment('Recuperando temporales')
+        tmp = generador.addTemp()
+        for tmp1 in tmp2:
+            tabla.size -= 1
+            generador.addExp(tmp, 'P', tabla.size, '+')
+            generador.getStack(tmp1, tmp)
+        generador.addComment('Fin de recuperacion de temporales')

@@ -209,6 +209,10 @@ class Generador:
         self.setImport('fmt')
         self.codeIn(f'fmt.Printf("%{type}", {value});\n')
     
+    def addPrintChar(self, value):
+        self.setImport('fmt')
+        self.codeIn(f'fmt.Printf("%c", int({value}));\n')
+    
 
     def printTrue(self):
         self.setImport('fmt')
@@ -263,7 +267,7 @@ class Generador:
         self.addIdent()
         self.addIf(tempC, '-1', '==', returnLbl)
         self.addIdent()
-        self.addPrint('c', tempC)
+        self.addPrintChar(tempC)
         self.addIdent()
         self.addExp(tempH, tempH, '1', '+')
         self.addIdent()

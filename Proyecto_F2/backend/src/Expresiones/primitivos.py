@@ -43,8 +43,8 @@ class Primitivos(Abstract):
                 generador.addGoto(self.trueLbl)
             
             ret = Return(self.valor, self.tipo, False)
-            ret.setTrueLbl(self.trueLbl)
-            ret.setFalseLbl(self.falseLbl)
+            ret.trueLbl = self.trueLbl
+            ret.falseLbl = self.falseLbl
             return ret
 
     def getTipo(self):

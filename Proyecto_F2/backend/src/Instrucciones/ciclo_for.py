@@ -1,4 +1,6 @@
 from ..Tabla_Simbolos.simbolo import Simbolo
+from ..Instrucciones._return import Return
+from ..Tabla_Simbolos.generador import Generador
 from ..Abstract.abstract import Abstract
 from ..Tabla_Simbolos.excepcion import Excepcion
 from ..Tabla_Simbolos.tabla_simbolos import TablaSimbolos
@@ -13,6 +15,16 @@ class For(Abstract):
         super().__init__(fila, columna)
     
     def interpretar(self, arbol, tabla):
+        genAux = Generador()
+        generador = genAux.getInstance()
+        generador.addComment('Compilacion de un for')
+
+        bandera = True
+        entorno = tabla
+        if tabla.findTabla(self.inicio.ide):
+            bandera = False
+
+
         nuevaTabla = TablaSimbolos(tabla)  # NUEVO ENTORNO
 
         inicio = self.inicio.interpretar(arbol, nuevaTabla)

@@ -201,6 +201,12 @@ def p_expresion_unaria(t):
     elif t[1] == '!':
         t[0] = Relacional_Logica(t[2], None, '!', t.lineno(1), find_column(input, t.slice[1]))
 
+
+
+def p_expresion_agrupacion(t):
+    'expresion : PARI expresion PARD'
+    t[0] = t[2]
+
 def p_identificador(t):
     'expresion : ID'
     t[0] = Identificador(t[1], t.lineno(1), find_column(input, t.slice[1]), None)
@@ -260,11 +266,11 @@ def parse(inp):
 
 entrada = '''
 
-function suma(a:number,b:number){
-    return a + b;
-}
+let a:string = "hola";
+let b:string = "Diego";
 
-console.log(suma(7,8) + suma(2,4));
+console.log(a);
+console.log(b);
 '''
 
 def test_lexer(lexer):

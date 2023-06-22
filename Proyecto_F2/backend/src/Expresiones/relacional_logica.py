@@ -16,7 +16,7 @@ class Relacional_Logica(Abstract):
         genAux = Generador()
         generador = genAux.getInstance()
 
-        if (self.op != ('&&' or '||' or '!')):
+        if (self.op != '&&' and self.op != '||' and self.op != '!'):
             generador.addComment("Compilacion de Expresion Relacional")
 
             left = self.op_izq.interpretar(arbol, tabla)
