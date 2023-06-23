@@ -12,9 +12,11 @@ import ply.yacc as yacc
 from Analizador_Lexico import tokens, lexer, errores, find_column
 from src.Expresiones.aritmetica import Aritmetica
 from src.Expresiones.primitivos import Primitivos
+from src.Expresiones.array import Array
 from src.Instrucciones.imprimir import Imprimir
 from src.Instrucciones.declaracion_variables import Declaracion_Variables
 from src.Tabla_Simbolos.tabla_simbolos import TablaSimbolos
+from src.Instrucciones.declaracion_arrays import Declaracion_Arrays
 import sys
 sys.setrecursionlimit(10000000)
 # Definicion de la jerarquia de operadores
@@ -51,6 +53,7 @@ def p_instrucciones_2(t):
 def p_instrucciones_evaluar(t):
     '''instruccion : imprimir PTCOMA
                     | declaracion_normal PTCOMA
+                    | declaracion_arrays PTCOMA
                     | condicional_ifs PTCOMA
                     | cliclo_for PTCOMA
                     | funcion PTCOMA
@@ -61,6 +64,7 @@ def p_instrucciones_evaluar(t):
 def p_instrucciones_evaluar_1(t):
     '''instruccion : imprimir
                     | declaracion_normal
+                    | declaracion_arrays
                     | condicional_ifs
                     | cliclo_for
                     | funcion
@@ -76,6 +80,11 @@ def p_imprimir(t):
 def p_declaracion_normal(t):
     'declaracion_normal : RLET ID DPUNTOS tipo IGUAL expresion'
     t[0] = Declaracion_Variables(t[2], t[4], t[6], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_declaracion_arrays(t):
+    'declaracion_arrays : RLET ID DPUNTOS tipo IGUAL CORI parametros_ll CORD'
+    t[0] = Declaracion_Arrays(t[2], t.lineno(1), find_column(input, t.slice[1]), t[7], t[4])
+
 
 def p_condicional_ifs(t):
     'condicional_ifs : RIF condicional_if'
@@ -201,7 +210,26 @@ def p_expresion_unaria(t):
     elif t[1] == '!':
         t[0] = Relacional_Logica(t[2], None, '!', t.lineno(1), find_column(input, t.slice[1]))
 
+def p_params_arrays(t):
+    'arrays_1 : arrays_1 CORI arrays_2 CORD'
+    t[1].append(t[3])
+    t[0] = t[1]
 
+def p_params_arrays_2(t):
+    'arrays_1 : CORI arrays_2 CORD'
+    t[0] = [t[2]]
+
+def p_params_arrays_3(t):
+    'arrays_2 : expresion'
+    t[0] = t[1]
+
+def p_params_arrays_4(t):
+    'expresion : ID arrays_1'
+    t[0] = Array(t[1], t[2], t.lineno(1), find_column(input, t.slice[1]))
+
+def p_expresion_array(t):
+    'expresion : CORI parametros_ll CORD'
+    t[0] = Declaracion_Arrays('', t.lineno(1), find_column(input, t.slice[1]), t[2])
 
 def p_expresion_agrupacion(t):
     'expresion : PARI expresion PARD'
@@ -241,6 +269,7 @@ def p_expresion_incrementable(t):
         incrementable = Primitivos('number', 1, t.lineno(2), find_column(input, t.slice[2]))
         t[0] = Aritmetica(t[1],incrementable, '-', t.lineno(2), find_column(input, t.slice[2]))
 
+
 def p_expresion_funcion(t):
     'expresion : llamada_funcion'
     t[0] = t[1]
@@ -266,11 +295,8 @@ def parse(inp):
 
 entrada = '''
 
-let a:string = "hola";
-let b:string = "Diego";
+let a:string;
 
-console.log(a);
-console.log(b);
 '''
 
 def test_lexer(lexer):

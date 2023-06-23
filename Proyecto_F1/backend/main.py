@@ -14,8 +14,7 @@ from werkzeug.utils import redirect
 app = Flask(__name__)
 CORS(app)
 
-
-@app.route('/saludo', methods = ["GET"])
+@app.route('/', methods = ["GET"])
 def saludo():
     return {"mensaje": "Hola mundo!"}
 
@@ -55,4 +54,4 @@ def salida():
     return json.dumps({'consola':consola, 'mensaje': 'Compilado :3'})
 
 if __name__ == '__main__':
-    app.run(debug = True, port=3000)
+    app.run(host='0.0.0.0', debug = False, port=4000)

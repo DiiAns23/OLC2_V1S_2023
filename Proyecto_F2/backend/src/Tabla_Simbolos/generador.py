@@ -21,6 +21,7 @@ class Generador:
         # Lista de Nativas
         self.printString = False
         self.compareString = False
+        self.boundError = False
 
         # Listas de imports
         self.imports = []
@@ -330,4 +331,18 @@ class Generador:
         self.putLabel(returnLbl)
         self.addEndFunc()
         self.inNatives = False
+    
+    def fboundError(self):
+        if self.boundError:
+            return
+        self.boundError = True
+        self.inNatives = True
+        self.addBeginFunc('BoundsError')
+        error = "Bounds Error \n"
+        for char in error:
+            self.addPrint("c",ord(char))
+        self.addEndFunc()
+        self.addSpace()
+        self.inNatives = False
+
 # console.log(4+5*6);

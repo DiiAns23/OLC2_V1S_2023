@@ -27,6 +27,8 @@ tokens  = [
     'PTCOMA',
     'PARI',
     'PARD',
+    'CORI',
+    'CORD',
     'LLAVEIZQ',
     'LLAVEDER',
     'MAS',
@@ -55,6 +57,8 @@ t_DPUNTOS       = r'\:'
 t_PTCOMA        = r'\;'
 t_PARI          = r'\('
 t_PARD          = r'\)'
+t_CORI          = r'\['
+t_CORD          = r'\]'
 t_LLAVEIZQ      = r'\{'
 t_LLAVEDER      = r'\}'
 t_MAS           = r'\+'
