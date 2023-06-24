@@ -57,7 +57,7 @@ class Llamada_Funcion(Abstract):
                         return Excepcion("Semantico", f"El tipo de dato de los parametros no coincide con la funcion {self.nombre}", self.fila, self.columna)
 
             generador.newEnv(size)
-            # self.getFuncion(funcion, arbol, tabla) # Sirve para llamar a una funcion nativa
+            self.getFuncion(generator=generador) # Sirve para llamar a una funcion nativa
             generador.callFun(funcion.nombre)
             generador.getStack(temp,'P')
             generador.retEnv(size)
@@ -97,3 +97,16 @@ class Llamada_Funcion(Abstract):
             generador.addExp(tmp, 'P', tabla.size, '+')
             generador.getStack(tmp1, tmp)
         generador.addComment('Fin de recuperacion de temporales')
+
+    def getFuncion(self, generator):
+        if self.nombre == 'length':
+            generator.fLength()
+        elif self.nombre == 'trunc':
+            generator.fTrunc()
+        elif self.nombre == 'float':
+            generator.fFloat()
+        elif self.nombre == 'uppercase':
+            generator.fUpperCase()
+        elif self.nombre == 'lowercase':
+            generator.fLowerCase()
+        return

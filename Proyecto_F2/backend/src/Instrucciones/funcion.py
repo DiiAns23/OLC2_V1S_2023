@@ -11,7 +11,7 @@ class Funcion(Abstract):
         self.nombre = nombre
         self.parametros = parametros
         self.instrucciones = instrucciones
-        self.tipo = 'number'
+        self.tipo = 'string'
         self.recTemp = True
         super().__init__(fila, columna)
     

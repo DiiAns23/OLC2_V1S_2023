@@ -1,3 +1,4 @@
+from src.Nativas.uppercase import UpperCase
 from src.Tabla_Simbolos.generador import Generador
 from src.Instrucciones._return import Return
 from src.Instrucciones.llamada_funcion import Llamada_Funcion
@@ -74,7 +75,7 @@ def p_instrucciones_evaluar_1(t):
     t[0] = t[1]
 
 def p_imprimir(t):
-    'imprimir : RCONSOLE PUNTO RLOG PARI expresion PARD'
+    'imprimir : RCONSOLE PUNTO RLOG PARI parametros_ll PARD'
     t[0] = Imprimir(t[5], t.lineno(1), find_column(input, t.slice[1]))
 
 def p_declaracion_normal(t):
@@ -278,6 +279,13 @@ def p_return(t):
     'r_return : RRETURN expresion'
     t[0] = Return(t[2], t.lineno(1), find_column(input, t.slice[1]))
 
+def agregarNativas(ast):
+    nombre = "uppercase"
+    params = [{'tipo':'string', 'ide':'uppercase##Param1'}]
+    inst = []
+    upper = UpperCase(nombre, params, inst, 'string', -1, -1)
+    ast.setFunciones('uppercase',upper)
+
 def p_error(t):
     print(" Error sintáctico en '%s'" % t.value)
 
@@ -294,9 +302,9 @@ def parse(inp):
     return parser.parse(inp)
 
 entrada = '''
+let a:string = "hola";
 
-let a:string;
-
+console.log(uppercase(a));
 '''
 
 def test_lexer(lexer):
@@ -317,6 +325,8 @@ instrucciones = parse(entrada)
 ast = Arbol(instrucciones)
 tsg = TablaSimbolos()
 ast.setTsglobal(tsg)
+
+agregarNativas(ast)
 
 for instruccion in ast.getInstr():
     value = instruccion.interpretar(ast,tsg)

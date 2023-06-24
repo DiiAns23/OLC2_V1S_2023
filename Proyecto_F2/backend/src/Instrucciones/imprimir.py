@@ -12,38 +12,39 @@ class Imprimir(Abstract):
         genAux = Generador()
         generator = genAux.getInstance()
 
-        value = self.expresion.interpretar(tree, table)
+        for valor in self.expresion:
+            value = valor.interpretar(tree, table)
 
-        if isinstance(value, Excepcion): return value
+            if isinstance(value, Excepcion): return value
 
-        if value.getTipo() == 'number':
-            generator.addPrint('f', value.getValue())
-        elif value.getTipo() == 'string':
-            generator.fPrintString()
+            if value.getTipo() == 'number':
+                generator.addPrint('f', value.getValue())
+            elif value.getTipo() == 'string':
+                generator.fPrintString()
 
-            paramTemp = generator.addTemp()
-            
-            generator.addExp(paramTemp, 'P', table.size, '+')
-            generator.addExp(paramTemp, paramTemp, '1', '+')
-            generator.setStack(paramTemp, value.value)
-            
-            generator.newEnv(table.size)
-            generator.callFun('printString')
+                paramTemp = generator.addTemp()
+                
+                generator.addExp(paramTemp, 'P', table.size, '+')
+                generator.addExp(paramTemp, paramTemp, '1', '+')
+                generator.setStack(paramTemp, value.value)
+                
+                generator.newEnv(table.size)
+                generator.callFun('printString')
 
-            temp = generator.addTemp()
-            generator.getStack(temp, 'P')
-            generator.retEnv(table.size)
-        elif value.getTipo() == 'boolean':
-            tempLbl = generator.newLabel()
+                temp = generator.addTemp()
+                generator.getStack(temp, 'P')
+                generator.retEnv(table.size)
+            elif value.getTipo() == 'boolean':
+                tempLbl = generator.newLabel()
 
-            generator.putLabel(value.getTrueLbl())
-            generator.printTrue()
+                generator.putLabel(value.getTrueLbl())
+                generator.printTrue()
 
-            generator.addGoto(tempLbl)
+                generator.addGoto(tempLbl)
 
-            generator.putLabel(value.getFalseLbl())
-            generator.printFalse()
+                generator.putLabel(value.getFalseLbl())
+                generator.printFalse()
 
-            generator.putLabel(tempLbl)
+                generator.putLabel(tempLbl)
 
         generator.addPrint('c', 10)

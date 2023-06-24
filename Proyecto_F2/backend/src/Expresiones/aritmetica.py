@@ -1,3 +1,4 @@
+from ..Instrucciones.llamada_funcion import Llamada_Funcion
 from ..Tabla_Simbolos.excepcion import Excepcion
 from ..Abstract.abstract import Abstract
 from ..Abstract.return__ import Return
@@ -17,10 +18,18 @@ class Aritmetica(Abstract):
         generador = genAux.getInstance()
         temporal = ''
         operador = ''
+        der = ''
         izq = self.op_izq.interpretar(tree, table)
         if isinstance(izq, Excepcion): return izq
-        der = self.op_der.interpretar(tree, table)
-        if isinstance(der, Excepcion): return der
+        if isinstance(self.op_der, Llamada_Funcion):
+            self.op_der.guardarTemps(generador, table, [izq.getValue()])
+            der = self.op_der.interpretar(tree, table)
+            if isinstance(der, Excepcion): return der
+            self.op_der.recuperarTemps(generador, table, [izq.getValue()])
+        else:
+            der = self.op_der.interpretar(tree, table)
+            if isinstance(der, Excepcion): return der
+
         if self.op == '+':
             operador = '+'
             temporal = generador.addTemp()

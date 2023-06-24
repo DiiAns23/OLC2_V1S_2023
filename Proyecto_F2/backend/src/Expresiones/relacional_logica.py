@@ -29,7 +29,7 @@ class Relacional_Logica(Abstract):
                 if isinstance(right, Excepcion): return right
                 if (left.getTipo() == 'number') and (right.getTipo() == 'number'):
                     self.checkLabels()
-                    generador.addIf(left.getValue(), right.getValue(), self.op, self.getTrueLbl())
+                    generador.addIf(left.getValue(), right.getValue(), self.getOperador(), self.getTrueLbl())
                     generador.addGoto(self.getFalseLbl())
                 elif (left.getTipo() == 'string') and (right.getTipo() == 'string'):
                     if self.op == '===' or self.op == '!==':
@@ -139,3 +139,10 @@ class Relacional_Logica(Abstract):
             return '1'
         if self.op == '!==':
             return '0'
+
+    def getOperador(self):
+        if self.op == '===':
+            return '=='
+        if self.op == '!==':
+            return '!='
+        return self.op
