@@ -1,5 +1,6 @@
 # CORS -> Cross Origin Resource Sharing
 # Si no existe el CORS, no se puede acceder a los recursos de un servidor desde otro servidor
+from typing import Dict, List
 from Analizador_Sintactico import parse as Analizar
 from src.Tabla_Simbolos.arbol import Arbol
 from src.Tabla_Simbolos.excepcion import Excepcion
@@ -23,7 +24,6 @@ def compilar():
     if request.method == "POST":
         entrada = request.data.decode("utf-8")
         entrada = json.loads(entrada)
-        print(entrada)
         global tmp_val
         tmp_val = entrada["codigo"]
         return redirect(url_for("salida"))
@@ -53,5 +53,85 @@ def salida():
     print('Consola: ', consola)
     return json.dumps({'consola':consola, 'mensaje': 'Compilado :3'})
 
+
+@app.route('/errores')
+def getErrores():
+    global Excepciones
+    aux = []
+    for x in Excepciones:
+        aux.append(x.toString2())
+    return {'valores': aux}
+
+@app.route('/simbolos')
+def getTabla():
+    global Simbolos
+    Dic = []
+    for x in Simbolos:
+        aux = Simbolos[x].getValor()
+        tipo = Simbolos[x].getTipo()
+        fila = Simbolos[x].getFila()
+        colum = Simbolos[x].getColumna()
+        if isinstance(aux, List):
+            aux = getValores(aux)
+            a = []
+            a.append(str(x))
+            a.append(str(aux))
+            a.append('Array')
+            a.append('Global')
+            a.append(str(fila))
+            a.append(str(colum))
+            Dic.append(a)
+        elif isinstance(aux, Dict):
+            aux = getValores2(aux)
+            a = []
+            a.append(str(x))
+            a.append(str(aux))
+            a.append('Struct')
+            a.append('Global')
+            a.append(str(fila))
+            a.append(str(colum))
+            Dic.append(a)
+        else:
+            a = []
+            a.append(str(x))
+            a.append(str(aux))
+            a.append(tipo)
+            a.append('Global')
+            a.append(str(fila))
+            a.append(str(colum))
+            Dic.append(a)
+    return {'valores':Dic}
+
+def getValores(anterior):
+    actual = []
+    for x in anterior:
+        a = x.getValor()
+        if isinstance(a, List):
+            value = getValores(a)
+            actual.append(value)
+        elif isinstance(a, Dict):
+            value = getValores2(a)
+            actual.append(value)
+        else:
+            actual.append(x.getValor())
+    return actual
+
+def getValores2( dict):
+    val = "("
+    for x in dict:
+        a = dict[x].getValor()
+        if isinstance(a, List):
+            value = getValores(a)
+            val += str(value) + ", "
+        elif isinstance(a, Dict):
+            value = getValores2(a)
+            val += str(value) + ", "
+        else:
+            val += str(dict[x].getValor()) + ", "
+    val = val[:-2]  
+    val += ")"
+    return val
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug = False, port=4000)
+    app.run(host='0.0.0.0', debug = False, port=5200)

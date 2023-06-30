@@ -284,37 +284,37 @@ def parse(inp):
     lexer.lineno = 1
     return parser.parse(inp)
 
-entrada = '''
+# entrada = '''
 
-let a: number = 5;
-console.log(typeof(toString(a))); // llamada a una funcion
-let b: number = 5;
-console.log(a+b); // llamada a una funcion
-'''
+# let a: number = 5;
+# console.log(typeof(toString(a))); // llamada a una funcion
+# let b: number = 5;
+# console.log(a+b); // llamada a una funcion
+# '''
 
-def test_lexer(lexer):
-    while True:
-        tok = lexer.token()
-        if not tok:
-            break  # No more input
-        print(tok)
+# def test_lexer(lexer):
+#     while True:
+#         tok = lexer.token()
+#         if not tok:
+#             break  # No more input
+#         print(tok)
 
 # lexer.input(entrada)
 # test_lexer(lexer)
-instrucciones = parse(entrada)
-ast = Arbol(instrucciones)
-tsg = TablaSimbolos()
-ast.setTsglobal(tsg)
-agregarNativas(ast)
+# instrucciones = parse(entrada)
+# ast = Arbol(instrucciones)
+# tsg = TablaSimbolos()
+# ast.setTsglobal(tsg)
+# agregarNativas(ast)
 
-for instruccion in ast.getInstr():
-    if isinstance(instruccion, Funcion):
-        ast.setFunciones(instruccion)
+# for instruccion in ast.getInstr():
+#     if isinstance(instruccion, Funcion):
+#         ast.setFunciones(instruccion)
 
-for instruccion in ast.getInstr():
-    if not(isinstance(instruccion, Funcion)):
-        value = instruccion.interpretar(ast,tsg)
-        if isinstance(value, Excepcion):
-            ast.setExcepciones(value)
-print(ast.getConsola())
+# for instruccion in ast.getInstr():
+#     if not(isinstance(instruccion, Funcion)):
+#         value = instruccion.interpretar(ast,tsg)
+#         if isinstance(value, Excepcion):
+#             ast.setExcepciones(value)
+# print(ast.getConsola())
 
